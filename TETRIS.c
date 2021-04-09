@@ -6,7 +6,6 @@
 #include <stdlib.h>
 #include <time.h>
 // Para utilizar Sleep
-//#include<windows.h>
 #include <unistd.h>
 //Define constantes el numero de filas V y el numero de columnas H
 #define V 40
@@ -19,8 +18,11 @@
 #include <termios.h>
 #include <fcntl.h>
 
+//Para clear
+#define clear() printf("\033[H\033[J")
+
 //Prototipos de las funciones
-void inicio(char campo[V][H], char campop[V][H], char l[4][6], char larg[2][8], char cuad[4][4], char t[4][6], char z[4][1], int r ,int inix, int iniy, int modx, int mody, int k);
+void inicio(char campo[V][H], char campop[V][H], char l[4][6], char larg[2][8], char cuad[4][4], char t[4][6], char z[4][1], int r ,int inix, int iniy, int modx, int mody);
 void borde(char campo[V][H]);
 void dl(char l[4][6]);
 void dlarg(char larg[2][8]);
@@ -28,14 +30,14 @@ void dcuad(char cuad[4][4]);
 void dt(char t[4][6]);
 void dz(char z[4][1]);
 void leercampo(char campo[V][H], long long puntaje);
-void inifig(char campo[V][H], char campop[V][H], char l[4][6], char larg[2][8], char cuad[4][4], char t[4][6], char z[4][1], int r ,int inix, int iniy, int modx, int mody, int k);
-void loopcampo(char campo[V][H], char campop[V][H], char l[4][6], char larg[2][8], char cuad[4][4], char t[4][6], char z[4][1], int r ,int inix, int iniy, int modx, int mody, int k, long long puntaje);
+void inifig(char campo[V][H], char campop[V][H], char l[4][6], char larg[2][8], char cuad[4][4], char t[4][6], char z[4][1], int r ,int inix, int iniy, int modx, int mody);
+void loopcampo(char campo[V][H], char campop[V][H], char l[4][6], char larg[2][8], char cuad[4][4], char t[4][6], char z[4][1], int r ,int inix, int iniy, int modx, int mody, long long puntaje);
 void draw(char campo[V][H], long long puntaje);
-void input(char campo[V][H], char campop[V][H],char l[4][6], char larg[2][8], char cuad[4][4], char t[4][6], char z[4][1], int *r ,int *inix, int *iniy, int *modx, int *mody, int *fin, int *k, int izq, int der, long long *puntaje);
-void update(char campo[V][H], char campop[V][H],char l[4][6], char larg[2][8], char cuad[4][4], char t[4][6], char z[4][1], int r ,int inix, int iniy, int modx, int mody, int k);
-void loopcampo2(char campo[V][H], char campop[V][H],char l[4][6], char larg[2][8], char cuad[4][4], char t[4][6], char z[4][1], int r ,int inix, int iniy, int modx, int mody, int k, long long puntaje);
-void input2(char campo[V][H], char campop[V][H],char l[4][6], char larg[2][8], char cuad[4][4], char t[4][6], char z[4][1], int *r ,int *inix, int *iniy, int *modx, int *mody, int *fin, int *k, int izq, int der, long long *puntaje);
-void final();
+void input(char campo[V][H], char campop[V][H], char l[4][6], char larg[2][8], char cuad[4][4], char t[4][6], char z[4][1], int *r ,int *inix, int *iniy, int *modx, int *mody, int *fin, int izq, int der, long long *puntaje);
+void update(char campo[V][H], char campop[V][H],char l[4][6], char larg[2][8], char cuad[4][4], char t[4][6], char z[4][1], int r ,int inix, int iniy, int modx, int mody);
+void loopcampo2(char campo[V][H], char campop[V][H],char l[4][6], char larg[2][8], char cuad[4][4], char t[4][6], char z[4][1], int r ,int inix, int iniy, int modx, int mody, long long puntaje);
+void input2(char campo[V][H], char campop[V][H],char l[4][6], char larg[2][8], char cuad[4][4], char t[4][6], char z[4][1], int *r ,int *inix, int *iniy, int *modx, int *mody, int *fin, int izq, int der, long long *puntaje);
+void final(void);
 void izquno(char campo[V][H], char l[4][6], char larg[2][8], char cuad[4][4], char t[4][6], char z[4][1], int r, int inix, int iniy, int k);
 void izqdos(char campo[V][H], char l[4][6], char larg[2][8], char cuad[4][4], char t[4][6], char z[4][1], int r, int inix, int iniy, int k);
 void izqtres(char campo[V][H], char l[4][6], char larg[2][8], char cuad[4][4], char t[4][6], char z[4][1], int r, int inix, int iniy, int k);
@@ -56,12 +58,11 @@ int kbhit(void);
 //
 
 
-int main(){
+int main(void){
 	int n,m;
 	int r;//Para obtener una figura aleatoria
 	int inix, iniy;//Posicion incial de la figura
 	int modx, mody;//Posicion Modificada
-	int k;
 	char campo[V][H]; //Campo de Juego
 	char campop[V][H]; //Campo auxiliar
 	char l[4][6]; //Figura L
@@ -82,8 +83,7 @@ int main(){
     srand(time(NULL)); //El mayordomo pone a girar la diana
 
     //Inicializar posiciones
-	//r = rand()%5;// Numero aleatorio
-	r = 4;
+	r = rand()%5;// Numero aleatorio
 	inix = (rand()%31) + 1;
 	iniy = 1;
 
@@ -103,15 +103,14 @@ int main(){
     printf("|    |    |    |    |    |    |    |\n");
     printf("v    v    v    v    v    v    v    v\n\n");
 
-	//system("pause");
+    //Pause
 	getchar();
 
 	//Funciones Principales
-	inicio(campo, campop, l, larg, cuad, t, z, r, inix, iniy, modx,mody, k);
-	loopcampo(campo, campop, l, larg, cuad, t, z, r, inix, iniy, modx, mody, k, puntaje);
+	inicio(campo, campop, l, larg, cuad, t, z, r, inix, iniy, modx, mody);
+	loopcampo(campo, campop, l, larg, cuad, t, z, r, inix, iniy, modx, mody, puntaje);
 
 
-	//system("pause");
 	return 0;
 }
 
@@ -146,14 +145,14 @@ int kbhit(void)
 
 
 //Esta funcion inicializa el campo de juego e introduce la figura inicial
-void inicio(char campo[V][H], char campop[V][H], char l[4][6], char larg[2][8], char cuad[4][4], char t[4][6], char z[4][1], int r ,int inix, int iniy, int modx, int mody, int k){
+void inicio(char campo[V][H], char campop[V][H], char l[4][6], char larg[2][8], char cuad[4][4], char t[4][6], char z[4][1], int r ,int inix, int iniy, int modx, int mody){
 	borde(campo);
 	dl(l);
 	dlarg(larg);
 	dcuad(cuad);
 	dt(t);
 	dz(z);
-	inifig(campo, campop, l, larg, cuad, t, z, r, inix, iniy, modx,mody, k);
+	inifig(campo, campop, l, larg, cuad, t, z, r, inix, iniy, modx, mody);
 }
 
 
@@ -350,8 +349,8 @@ void leercampo(char campo[V][H], long long puntaje){
 
 
 //Posicion inicial de todos lo objetos en el campo al actualizarla
-void inifig(char campo[V][H], char campop[V][H], char l[4][6], char larg[2][8], char cuad[4][4], char t[4][6], char z[4][1], int r ,int inix, int iniy, int modx, int mody, int k){
-int i,j, h;
+void inifig(char campo[V][H], char campop[V][H], char l[4][6], char larg[2][8], char cuad[4][4], char t[4][6], char z[4][1], int r ,int inix, int iniy, int modx, int mody){
+int i,j, h, k;
 int cont = 0;//para rayo
 int tra = 0;
 
@@ -511,24 +510,21 @@ for(i = iniy+1; i <= iniy+cont ; i+=2){
 
 
 //Primer ciclo
-void loopcampo(char campo[V][H], char campop[V][H], char l[4][6], char larg[2][8], char cuad[4][4], char t[4][6], char z[4][1], int r ,int inix, int iniy, int modx, int mody, int k, long long puntaje){
+void loopcampo(char campo[V][H], char campop[V][H], char l[4][6], char larg[2][8], char cuad[4][4], char t[4][6], char z[4][1], int r ,int inix, int iniy, int modx, int mody, long long puntaje){
 	int i,j;
 	int fin;
 	fin = 0;
 	int izq,der = 0;
-	//unsigned int sleep(unsigned int seconds);
 
 	puntaje += 100;
-	//system("COLOR 0F");
 
 	do{
 		draw(campo, puntaje);//Dibujar en pantalla
 		// Figura toca a otra figura
         toca(campo, campop, &r, &inix, &iniy, &modx, &fin, &izq, &der);
         //
-		input(campo, campop,l, larg, cuad, t, z, &r,&inix, &iniy, &modx, &mody, &fin, &k, izq, der, &puntaje);//Verificar y modificar posiciones
-		update(campo, campop,l, larg, cuad, t, z, r, inix, iniy, modx, mody, k);//Actualizar matriz
-		//Sleep(15);//controla la velocidad de cambio de actualizacion
+		input(campo, campop,l, larg, cuad, t, z, &r,&inix, &iniy, &modx, &mody, &fin, izq, der, &puntaje);//Verificar y modificar posiciones
+		update(campo, campop,l, larg, cuad, t, z, r, inix, iniy, modx, mody);//Actualizar matriz
 		usleep(150000);//controla la velocidad de cambio de actualizacion
 	}while(fin == 0);
 	if (fin == 1){
@@ -537,7 +533,7 @@ void loopcampo(char campo[V][H], char campop[V][H], char l[4][6], char larg[2][8
 	modx = rand()%4;// Numero aleatorio
 	inix = (rand()%31) + 1;// Numero aleatorio
 	//se entra en otro ciclo, para que ingrese otra figura al campo.
-	loopcampo2(campo, campop, l, larg, cuad, t, z, r, inix, iniy, modx, mody, k, puntaje);
+	loopcampo2(campo, campop, l, larg, cuad, t, z, r, inix, iniy, modx, mody, puntaje);
     }
 }
 
@@ -545,12 +541,13 @@ void loopcampo(char campo[V][H], char campop[V][H], char l[4][6], char larg[2][8
 //Ejecuta la funcion leercampo
 void draw(char campo[V][H], long long puntaje){
 	system("clear");
+	//clear();
 	leercampo(campo, puntaje);
 }
 
 
 //Modifica el campo de juego para en Primer ciclo
-void input(char campo[V][H], char campop[V][H],char l[4][6], char larg[2][8], char cuad[4][4], char t[4][6], char z[4][1], int *r ,int *inix, int *iniy, int *modx, int *mody, int *fin, int *k, int izq, int der, long long *puntaje){
+void input(char campo[V][H], char campop[V][H],char l[4][6], char larg[2][8], char cuad[4][4], char t[4][6], char z[4][1], int *r ,int *inix, int *iniy, int *modx, int *mody, int *fin, int izq, int der, long long *puntaje){
     char tecla;
     int i,j;//Para loops
     int m;//Para loops
@@ -645,7 +642,6 @@ void input(char campo[V][H], char campop[V][H],char l[4][6], char larg[2][8], ch
 	//Modifica la posicion de la figura en campo, con entradas externas
 	//Derecha, izquierda y hacia abajo
 	if(kbhit() > 0){
-        //getchar();
 		tecla = getchar();
 
 	    //Movimiento izquieda
@@ -698,7 +694,7 @@ void input(char campo[V][H], char campop[V][H],char l[4][6], char larg[2][8], ch
 		//Para poner pausea
 		if(tecla == 'p'){
 		printf("                  PAUSE\n");
-		//system("pause");
+		//Pause
 		getchar();
 	    }
 	}
@@ -710,35 +706,32 @@ void input(char campo[V][H], char campop[V][H],char l[4][6], char larg[2][8], ch
 
 
 //Se encarga de actualizar el campo
-void update(char campo[V][H], char campop[V][H],char l[4][6], char larg[2][8], char cuad[4][4], char t[4][6], char z[4][1], int r ,int inix, int iniy, int modx,int mody, int k){
+void update(char campo[V][H], char campop[V][H],char l[4][6], char larg[2][8], char cuad[4][4], char t[4][6], char z[4][1], int r ,int inix, int iniy, int modx,int mody){
 	borde(campo);
 	dl(l);
 	dlarg(larg);
 	dcuad(cuad);
 	dt(t);
 	dz(z);
-	inifig(campo, campop, l, larg, cuad, t, z, r, inix, iniy, modx, mody, k);
+	inifig(campo, campop, l, larg, cuad, t, z, r, inix, iniy, modx, mody);
 }
 
 
 //Segundo ciclo
-void loopcampo2(char campo[V][H],char campop[V][H] ,char l[4][6], char larg[2][8], char cuad[4][4], char t[4][6], char z[4][1], int r ,int inix, int iniy, int modx, int mody, int k, long long puntaje){
+void loopcampo2(char campo[V][H],char campop[V][H] ,char l[4][6], char larg[2][8], char cuad[4][4], char t[4][6], char z[4][1], int r ,int inix, int iniy, int modx, int mody, long long puntaje){
 	int i,j,fin;
 	fin = 0;
 	int izq, der = 0;
 
 	puntaje += 100;
-	//system("COLOR 0A");
 
 	do{
 		draw(campo, puntaje);//Dibujar en pantalla
 		// Figura toca a otra figura
         toca(campo, campop, &r, &inix, &iniy, &modx, &fin, &izq, &der);
         //
-		input2(campo, campop, l, larg, cuad, t, z, &r,&inix, &iniy, &modx, &mody, &fin, &k, izq, der, &puntaje);//Verificar y modificar posiciones
-		update(campo, campop, l, larg, cuad, t, z, r, inix, iniy, modx, mody, k);//Actualizar matriz
-		//Sleep(15);
-		//sleep(15);//controla la velocidad de cambio de actualizacion
+		input2(campo, campop, l, larg, cuad, t, z, &r,&inix, &iniy, &modx, &mody, &fin, izq, der, &puntaje);//Verificar y modificar posiciones
+		update(campo, campop, l, larg, cuad, t, z, r, inix, iniy, modx, mody);//Actualizar matriz
 		usleep(150000);//controla la velocidad de cambio de actualizacion
 	}while(fin == 0);
 
@@ -747,12 +740,12 @@ void loopcampo2(char campo[V][H],char campop[V][H] ,char l[4][6], char larg[2][8
 	modx = rand()%4;// Numero aleatorio
 	inix = (rand()%31) + 1;// Numero aleatorio
 	//Entra nueva mente al ciclo uno, para seguir jugando
-	loopcampo(campo, campop, l, larg, cuad, t, z, r, inix, iniy, modx, mody, k, puntaje);
+	loopcampo(campo, campop, l, larg, cuad, t, z, r, inix, iniy, modx, mody, puntaje);
 }
 
 
 //Modifica el campo de juego para en segundo ciclo
-void input2(char campo[V][H], char campop[V][H], char l[4][6], char larg[2][8], char cuad[4][4], char t[4][6], char z[4][1], int *r ,int *inix, int *iniy, int *modx, int *mody, int *fin, int *k, int izq, int der, long long *puntaje){
+void input2(char campo[V][H], char campop[V][H], char l[4][6], char larg[2][8], char cuad[4][4], char t[4][6], char z[4][1], int *r ,int *inix, int *iniy, int *modx, int *mody, int *fin, int izq, int der, long long *puntaje){
     char tecla;
     int i,j;
     int m;
@@ -905,7 +898,7 @@ void input2(char campo[V][H], char campop[V][H], char l[4][6], char larg[2][8], 
 	    //Para poner pause
 	    if(tecla == 'p'){
 		   printf("                  PAUSE\n");
-		   //system("pause");
+		   //Pause
 		   getchar();
 	    }
 	////////////////////////////Acaba movimiento
@@ -918,10 +911,10 @@ void input2(char campo[V][H], char campop[V][H], char l[4][6], char larg[2][8], 
 
 
 //Finaliza el juego cuando el jugador pierde(XD)
-void final(){
+void final(void){
 
 	printf("              !GAME  OVER!              \n");
-	system("pause");
+	getchar();
 
 }
 
